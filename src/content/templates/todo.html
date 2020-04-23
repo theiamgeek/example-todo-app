@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% set page_title = 'Example Todo App' %}
+
+{% block scripts_bottom %}
+
+<script src="/public/js/todo-app.bundle.js?v={{ APP_VERSION }}"></script>
+
+{% endblock %}

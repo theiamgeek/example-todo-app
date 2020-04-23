@@ -1,0 +1,89 @@
+<todo-card>
+
+  <button type="text"
+          class="complete-button"
+          onclick={ onClick }>{ props.title }</button>
+  <button type="button"
+          class="remove-button"
+          onclick={ onRemoveClick }>Delete</button>
+
+
+  <script type="ts">
+    import {RiotComponentExport} from 'riot';
+
+    interface Props {
+      title: string;
+      complete: boolean;
+      onChange: () => void;
+      onDelete: () => void;
+    }
+
+    function build(): RiotComponentExport<Props, never> {
+      return {
+        onBeforeMount(currentProps: Props): void {
+          if (!currentProps.title) {
+            throw new Error('TodoCard is missing required property "title".');
+          }
+          if (!currentProps.hasOwnProperty('complete')) {
+            throw new Error('TodoCard is missing required property "complete".');
+          }
+          if (!currentProps.onChange) {
+            throw new Error('TodoCard is missing required event handler "onChange".');
+          }
+          if (!currentProps.onDelete) {
+            throw new Error('TodoCard is missing required event handler "onDelete".');
+          }
+        },
+
+        onClick(): void {
+          this.props.onChange();
+        },
+
+        onRemoveClick(): void {
+          this.props.onDelete();
+        }
+      };
+    }
+
+    export default build;
+  </script>
+
+
+  <style type="scss">
+    @use 'src/client/sass/vars/colors';
+
+    :host {
+      display: flex;
+      margin-top: 0.5rem;
+      background-color: darken(colors.$background, 8);
+      padding: 0.45rem;
+      border-radius: 2px;
+      font-size: 1.2rem;
+    }
+
+    .complete-button {
+      background: none;
+      border: none;
+      display: block;
+      width: 100%;
+      height: 100%;
+      font-size: inherit;
+      text-align: left;
+
+      :host[complete] & {
+        text-decoration: line-through;
+      }
+    }
+
+    .remove-button {
+      padding: 0;
+      background: none;
+      border: none;
+      margin: auto 0;
+      text-transform: lowercase;
+      text-decoration: underline;
+    }
+
+  </style>
+
+</todo-card>

@@ -1,0 +1,201 @@
+<todo-app>
+
+  <div class="wrap">
+    <app-header/>
+
+    <div class="wrap-inner">
+
+      <!-- Create -->
+      <div class="field">
+        <label for="add-todo-input">Add Todo:</label>
+        <div class="field-row">
+          <input id="add-todo-input"
+                 type="text"/>
+          <button type="button"
+                  onclick={ onAddTodoClick }>Add</button>
+        </div>
+      </div>
+
+      <!-- List -->
+      <ul class="todo-list">
+        <li each={ todo in state.todos }
+            is="todo-card"
+            title={ todo.title }
+            complete={ todo.complete }
+            on-change={ () => onTodoChange(todo.id) }
+            on-delete={ () => onTodoDelete(todo.id) }/>
+      </ul>
+    </div>
+
+    <app-footer/>
+  </div>
+
+  <script type="ts">
+    import {RiotComponentExport} from 'riot';
+    import {TodoModel} from '../../../server/models/todo-model';
+    import {createTodo, deleteTodo, getTodos, updateTodo} from './todo.api';
+    import TodoCard from './todo-card.riot';
+    import AppFooter from './app-footer.riot';
+    import AppHeader from './app-header.riot';
+
+    interface State {
+      todos: TodoModel[];
+      draggingTodoId: number | null;
+    }
+
+    interface TodoApp extends RiotComponentExport<never, State> {
+      state: State;
+    }
+
+    function build(): TodoApp {
+      return {
+        state: {
+          todos: [],
+          draggingTodoId: null
+        },
+
+        onBeforeMount(): void {
+          this.getTodos();
+        },
+
+        onAddTodoClick(): void {
+          const value = this.$('#add-todo-input').value;
+          if (!value) {
+            return;
+          }
+
+          this.$('#add-todo-input').value = '';
+          this.$('#add-todo-input').focus();
+          this.createTodo(value);
+        },
+
+        onTodoChange(id: number): void {
+          // update locally
+          const todo = this.state.todos.find(todo => todo.id === id);
+          if (!todo) {
+            throw new Error('HOW ON EARTH DID THIS HAPPEN?!!');
+          }
+          todo.complete = !todo.complete;
+          this.update();
+          this.updateTodo(todo);
+        },
+
+        onTodoDelete(id: number): void {
+          // update locally
+          const index = this.state.todos.findIndex(todo => todo.id === id);
+          if (index < 0) {
+            throw new Error('HOW ON EARTH DID THIS HAPPEN!');
+          }
+          this.state.todos.splice(index, 1);
+          this.update();
+          // submit
+          this.deleteTodo(id);
+        },
+
+        async updateTodo(todo: TodoModel): Promise<void> {
+          await updateTodo(todo);
+          await this.getTodos();
+        },
+
+        async getTodos(): Promise<void> {
+          this.update({
+            todos: await getTodos()
+          });
+        },
+
+        async createTodo(title: string): Promise<void> {
+          await createTodo(new TodoModel({
+            title: title,
+            complete: false
+          }));
+          await this.getTodos();
+        },
+
+        async deleteTodo(id: number): Promise<void> {
+          await deleteTodo(id);
+          await this.getTodos();
+        }
+      };
+    }
+
+    build.components = {
+      TodoCard,
+      AppFooter,
+      AppHeader
+    };
+
+    export default build;
+  </script>
+
+  <style type="scss">
+    @use 'src/client/sass/vars/colors';
+
+    :host {
+      display: block;
+    }
+
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+      background-color: darken(colors.$background, 15);
+      padding: 0;
+    }
+
+    .wrap-inner {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      height: calc(100% - 70px - 47px);
+    }
+
+    .todo-list {
+      padding: 0 4px 0 12px;
+      list-style: none;
+      overflow-y: scroll;
+      height: 100%;
+      background: darken(colors.$background, 80);
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      &::-webkit-scrollbar-track {
+        background: darken(colors.$background, 80);
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: darken(colors.$background, 40);
+        border-radius: 0;
+      }
+    }
+
+    .field {
+      label {
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 0.2rem;
+      }
+
+      .field-row {
+        display: flex;
+      }
+
+      input {
+        padding: 0.4rem 0.3rem;
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      button {
+        border: 1px solid #000000;
+        border-radius: 3px;
+        padding: 0.4rem;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</todo-app>
