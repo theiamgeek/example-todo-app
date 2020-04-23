@@ -7,4 +7,5 @@ This is an example project written in our [Unthink Stack](https://github.com/epa
 - Clone this repo
 - `npm install`
 - Setup the `.env` file: `cp .env.local .env`
+- Set up the certs for localhost (the project requires SSL)
 - `npm start`
