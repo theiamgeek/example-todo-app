@@ -46,7 +46,7 @@ export async function updateTodo(todo: TodoModel): Promise<void> {
       },
       body: JSON.stringify({
         title: todo.title,
-        complete: 'oi'
+        complete: todo.complete
       })
     }
   );
