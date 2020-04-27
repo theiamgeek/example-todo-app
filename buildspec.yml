@@ -20,16 +20,15 @@ phases:
       - npm run build-sass
       - npm run build-client
       - npm run build-content
-      - export CODEBUILD_BUILD_UUID = "$(echo $CODEBUILD_BUILD_ID | cut -d':' -f2)"
-      - echo Building Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID
-      - docker build --progress plain --tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID .
-      - echo tagging Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID to go into $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID
-      - docker tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Building Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID
+      - docker build --progress plain --tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID .
+      - echo tagging Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID to go into $IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID
+      - docker tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/%IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/%IMAGE_REPO_NAME:$CODEBUILD_BUILD_ID
 artifacts:
   files:
     - 'public/**/*'
