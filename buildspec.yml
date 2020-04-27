@@ -20,7 +20,7 @@ phases:
       - npm run build-sass
       - npm run build-client
       - npm run build-content
-      - CODEBUILD_BUILD_UUID = "$(echo $CODEBUILD_BUILD_ID | cut -d':' -f2)"
+      - export CODEBUILD_BUILD_UUID = "$(echo $CODEBUILD_BUILD_ID | cut -d':' -f2)"
       - echo Building Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID
       - docker build --progress plain --tag $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID .
       - echo tagging Docker image $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID to go into $IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_UUID
