@@ -10,5 +10,5 @@ COPY lib ./lib
 
 EXPOSE 80
 
-CMD ["node", ./lib/server/server.js]
+CMD ["node", "/opt/todo/lib/server/server.js"]
 
