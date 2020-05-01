@@ -2,7 +2,6 @@ version: 0.2
 env:
   variables:
     CONT_NAME: "todo-app"
-    CONT_PORT: "80"
     DEPLOYMENT_SUBNETS: "\"subnet-038928ad2a03712a0\",\"subnet-078635a58e7f78177\""
     DEPLOYMENT_SGS: "\"sg-07e8b034d9a8af9ae\""
     TASK_NAME: "todo-app"
@@ -18,8 +17,6 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --no-include-email --region $AWS_REGION)
-      - echo installing JQ
-      - apt-get install jq
   build:
     commands:
       - echo Build started on `date`
