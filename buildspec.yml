@@ -48,8 +48,8 @@ phases:
 artifacts:
   files:
     - 'public/**/*'
-    secondary-artifacts:
-      appspec-file:
-        files:
-          - appspec.json
+  secondary-artifacts:
+    appspec-file:
+      files:
+        - appspec.json
 
