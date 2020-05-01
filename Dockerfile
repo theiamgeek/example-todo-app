@@ -16,5 +16,5 @@ COPY entrypoint.sh /opt/todo/entrypoint.sh
 
 ENTRYPOINT ["/opt/todo/entrypoint.sh"]
 
-CMD ["node", "/opt/todo/lib/server/server.js"]
+CMD ["/usr/local/bin/node", "/opt/todo/lib/server/server.js"]
 
