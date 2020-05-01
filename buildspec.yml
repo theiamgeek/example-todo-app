@@ -10,6 +10,8 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --no-include-email --region $AWS_REGION)
+      - echo installing JQ
+      - apt install jq
   build:
     commands:
       - echo Build started on `date`
@@ -30,8 +32,10 @@ phases:
       - echo Pushing Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER
       - envsubst < task_def.json > populated_task_def.json
-      - aws ecs register-task-definition --cli-input-json file://populated_task_def.json
+      - export TASK_DEF = `aws ecs register-task-definition --cli-input-json file://populated_task_def.json | jq -r .taskDefinition.taskDefinitionArn`
+      - envsubst < appspec_template.json > appspec.json
 artifacts:
   files:
     - 'public/**/*'
+    - appspec.json
 
