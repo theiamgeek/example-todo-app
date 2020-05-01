@@ -44,6 +44,7 @@ phases:
       - echo Exporting new Task Definition to ECS...
       - export TASK_DEF=`aws ecs register-task-definition --cli-input-json file://taskdef.json --region "$AWS_REGION" | jq -r .taskDefinition.taskDefinitionArn`
       - echo Filling Application Specification template...
+      - echo $TASK_DEF
       - envsubst < appspec_template.json > appspec.json
 artifacts:
   files:
