@@ -2,10 +2,10 @@
 
 echo $MONGO_PASSWD
 
-python --version
-python3 --version
+python --version || true
+python3 --version || true
 
-which python
-which python3
+which python || true
+which python3 || true
 
 exec "$@"
