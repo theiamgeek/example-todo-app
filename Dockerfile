@@ -12,9 +12,9 @@ COPY lib ./lib
 
 EXPOSE 80
 
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /opt/todo/entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/opt/todo/entrypoint.sh"]
 
 CMD ["node", "/opt/todo/lib/server/server.js"]
 
