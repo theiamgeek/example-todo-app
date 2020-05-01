@@ -1,0 +1,89 @@
+{
+    "family": "todo-app",
+    "executionRoleArn": "arn:aws:iam::904948009583:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "todo-app-container",
+            "image": "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER",
+            "portMappings": [
+                {
+                    "containerPort": 80,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "CONTENT_BASE_PATH",
+                    "value": "/opt/todo/lib/content"
+                },
+                {
+                    "name": "EXPRESS_SERVER_PORT",
+                    "value": "80"
+                },
+                {
+                    "name": "MONGO_DB_DEFAULT_COLLECTION",
+                    "value": "todo"
+                },
+                {
+                    "name": "MONGO_DB_DEFAULT_DB",
+                    "value": "todo"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "NUNJUCKS_TEMPLATE_BASE_PATH",
+                    "value": "/opt/todo/lib/content/templates"
+                },
+                {
+                    "name": "NUNJUCKS_TEMPLATE_ERROR",
+                    "value": "error.html"
+                },
+                {
+                    "name": "NUNJUCKS_TEMPLATE_FATAL_ERROR",
+                    "value": "error.html"
+                },
+                {
+                    "name": "NUNJUCKS_TEMPLATE_NOT_FOUND",
+                    "value": "not-found.html"
+                },
+                {
+                    "name": "NUNJUCKS_TEMPLATE_UNAUTHORIZED",
+                    "value": "unauthorized.html"
+                },
+                {
+                    "name": "PINO_LOG_LEVEL",
+                    "value": "error"
+                },
+                {
+                    "name": "MONGO_DB_URL",
+                    "value": "mongodb://application:${MONGO_PASSWD}@docdb-2020-04-28-21-18-17.cluster-cbggdz2mxu6m.us-east-1.docdb.amazonaws.com:27017/?replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false"
+                }
+            ],
+            "secrets": [
+                {
+                    "name": "MONGO_PASSWD",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:904948009583:secret:docdbsecret-hq1ZYN"
+                }
+            ],
+            "disableNetworking": false,
+            "readonlyRootFilesystem": true,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/first-run-task-definition",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512"
+}
