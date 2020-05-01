@@ -1,14 +1,14 @@
 {
-    "family": "todo-app",
-    "executionRoleArn": "arn:aws:iam::904948009583:role/ecsTaskExecutionRole",
+    "family": "$TASK_NAME",
+    "executionRoleArn": "$TASK_EXEC_ROLE",
     "networkMode": "awsvpc",
     "containerDefinitions": [
         {
-            "name": "todo-app-container",
+            "name": "$CONT_NAME",
             "image": "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER",
             "portMappings": [
                 {
-                    "containerPort": 80,
+                    "containerPort": "$CONT_PORT",
                     "protocol": "tcp"
                 }
             ],
@@ -62,7 +62,7 @@
             "secrets": [
                 {
                     "name": "MONGO_DB_URL",
-                    "valueFrom": "arn:aws:ssm:us-east-1:904948009583:parameter/docdbsecret"
+                    "valueFrom": "$MONGO_DB_URL_ARN"
                 }
             ],
             "disableNetworking": false,
@@ -70,9 +70,9 @@
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
-                    "awslogs-group": "/ecs/first-run-task-definition",
-                    "awslogs-region": "us-east-1",
-                    "awslogs-stream-prefix": "ecs"
+                    "awslogs-group": "$CONT_LOG_GP",
+                    "awslogs-region": "$AWS_REGION",
+                    "awslogs-stream-prefix": "$CONT_LOG_STRM_PFIX"
                 }
             }
         }

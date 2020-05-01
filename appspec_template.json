@@ -7,18 +7,17 @@
                 "Properties": {
                     "TaskDefinition": "$TASK_DEF",
                     "LoadBalancerInfo": {
-                        "ContainerName": "todo-app-container",
-                        "ContainerPort": 80
+                        "ContainerName": "$CONT_NAME",
+                        "ContainerPort": "$CONT_PORT"
                     },
                     "PlatformVersion": "LATEST",
                     "NetworkConfiguration": {
                         "AwsvpcConfiguration": {
                             "Subnets": [
-                                "subnet-038928ad2a03712a0",
-                                "subnet-078635a58e7f78177"
+                                $DEPLOYMENT_SUBNETS
                             ],
                             "SecurityGroups": [
-                                "sg-07e8b034d9a8af9ae"
+                                $DEPLOYMENT_SGS
                             ],
                             "AssignPublicIp": "ENABLED"
                         }

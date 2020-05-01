@@ -1,7 +1,15 @@
 version: 0.2
 env:
   variables:
-    "TAGNAME": ""
+    CONT_NAME: "todo-app"
+    CONT_PORT: "80"
+    DEPLOYMENT_SUBNETS: "\"subnet-038928ad2a03712a0\",\"subnet-078635a58e7f78177\""
+    DEPLOYMENT_SGS: "\"sg-07e8b034d9a8af9ae\""
+    TASK_NAME: "todo-app"
+    TASK_EXEC_ROLE: "arn:aws:iam::904948009583:role/ecsTaskExecutionRole"
+    MONGO_DB_URL_ARN: "arn:aws:ssm:us-east-1:904948009583:parameter/docdbsecret"
+    CONT_LOG_GP: "/ecs/first-run-task-definition"
+    CONT_LOG_STRM_PFIX: "ecs"
 phases:
   install:
     runtime-versions:
@@ -31,11 +39,17 @@ phases:
       - echo Build completed on `date`
       - echo Pushing Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER
-      - envsubst < task_def.json > populated_task_def.json
-      - export TASK_DEF=`aws ecs register-task-definition --cli-input-json file://populated_task_def.json --region "$AWS_REGION" | jq -r .taskDefinition.taskDefinitionArn`
+      - echo Filling Task Definition template...
+      - envsubst < taskdef_template.json > taskdef.json
+      - echo Exporting new Task Definition to ECS...
+      - export TASK_DEF=`aws ecs register-task-definition --cli-input-json file://taskdef.json --region "$AWS_REGION" | jq -r .taskDefinition.taskDefinitionArn`
+      - echo Filling Application Specification template...
       - envsubst < appspec_template.json > appspec.json
 artifacts:
   files:
     - 'public/**/*'
-    - appspec.json
+    secondary-artifacts:
+      appspec-file:
+        files:
+          - appspec.json
 
