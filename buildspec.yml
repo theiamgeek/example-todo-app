@@ -49,7 +49,7 @@ artifacts:
   files:
     - 'public/**/*'
   secondary-artifacts:
-    appspec-file:
+    appspec:
       files:
         - appspec.json
 
