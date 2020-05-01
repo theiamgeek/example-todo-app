@@ -8,7 +8,7 @@
             "image": "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_BUILD_NUMBER",
             "portMappings": [
                 {
-                    "containerPort": "$CONT_PORT",
+                    "containerPort": $CONT_PORT,
                     "protocol": "tcp"
                 }
             ],
