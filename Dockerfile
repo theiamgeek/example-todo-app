@@ -4,7 +4,7 @@ WORKDIR /opt/todo
 
 COPY package*.json ./
 
-RUN apt-get install jq
+RUN apt-get install python
 
 RUN npm install --production
 
