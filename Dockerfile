@@ -4,7 +4,7 @@ WORKDIR /opt/todo
 
 COPY package*.json ./
 
-RUN apt-get install python
+RUN apt-get install python3
 
 RUN npm install --production
 
