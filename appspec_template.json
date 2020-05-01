@@ -8,7 +8,7 @@
                     "TaskDefinition": "$TASK_DEF",
                     "LoadBalancerInfo": {
                         "ContainerName": "$CONT_NAME",
-                        "ContainerPort": "$CONT_PORT"
+                        "ContainerPort": $CONT_PORT
                     },
                     "PlatformVersion": "LATEST",
                     "NetworkConfiguration": {
