@@ -1,0 +1,30 @@
+{
+    "version": 0.0,
+    "Resources": [
+        {
+            "TargetService": {
+                "Type": "AWS::ECS::Service",
+                "Properties": {
+                    "TaskDefinition": "$TASK_DEF",
+                    "LoadBalancerInfo": {
+                        "ContainerName": "todo-app-container",
+                        "ContainerPort": 80
+                    },
+                    "PlatformVersion": "LATEST",
+                    "NetworkConfiguration": {
+                        "AwsvpcConfiguration": {
+                            "Subnets": [
+                                "subnet-038928ad2a03712a0",
+                                "subnet-078635a58e7f78177"
+                            ],
+                            "SecurityGroups": [
+                                "sg-07e8b034d9a8af9ae"
+                            ],
+                            "AssignPublicIp": "ENABLED"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
