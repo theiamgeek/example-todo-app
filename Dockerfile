@@ -10,5 +10,5 @@ COPY lib ./lib
 
 EXPOSE 80
 
-CMD ["node", "/opt/todo/lib/server/server.js"]
-
+#CMD ["node", "/opt/todo/lib/server/server.js"]
+CMD ["echo", "$MONGO_DB_URL"]
