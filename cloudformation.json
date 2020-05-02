@@ -62,7 +62,8 @@
             "NoEcho": "true"
         },
         "MongoInstanceClass": {
-            "Type": "String"
+            "Type": "String",
+            "Default": "db.r5.large"
         }
     },
     "Resources": {
@@ -636,7 +637,7 @@
         "CloudFrontDistro": {
             "Type": "AWS::CloudFront::Distribution",
             "Properties": {
-                "DistrbutionConfig": {
+                "DistributionConfig": {
                     "Aliases": [
                         {
                             "Ref": "Domain"
@@ -993,32 +994,6 @@
                 ]
             }
         },
-        "MongoDBClusterParameterGroup": {
-            "Type": "AWS::DocDB::DBClusterParameterGroup",
-            "Properties": {
-                "Description": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "Namespace"
-                            },
-                            "documentdb-cluster-parameter-group"
-                        ]
-                    ]
-                },
-                "Family": "docdb3.6",
-                "Parameters": {
-                    "audit_logs": "enabled",
-                    "change_stream_log_retention_duration": "10800",
-                    "profiler": "disabled",
-                    "profiler_sampling_rate": "1.0",
-                    "profiler_threshold_ms": "100",
-                    "tls": "disabled",
-                    "ttl_monitor": "enabled"
-                }
-            }
-        },
         "MongoDBClusterSubnetGroup": {
             "Type": "AWS::DocDB::DBSubnetGroup",
             "Properties": {
@@ -1077,9 +1052,6 @@
                         "Ref": "SubnetAz3"
                     }
                 ],
-                "DBClusterParameterGroup": {
-                    "Ref": "MongoDBClusterParameterGroup"
-                },
                 "DBSubnetGroupName": {
                     "Ref": "MongoDBClusterSubnetGroup"
                 },
