@@ -1007,17 +1007,7 @@
                         ]
                     ]
                 },
-                "Family": {
-                    "Fn::Join": [
-                        "-",
-                        [
-                            {
-                                "Ref": "Namespace"
-                            },
-                            "docdb"
-                        ]
-                    ]
-                },
+                "Family": "docdb3.6",
                 "Parameters": {
                     "audit_logs": "enabled",
                     "change_stream_log_retention_duration": "10800",
