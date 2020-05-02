@@ -1035,13 +1035,13 @@
                 },
                 "SubnetIds": [
                     {
-                        "Ref": "SubnetAz1"
+                        "Ref": "PublicSubnetAz1"
                     },
                     {
-                        "Ref": "SubnetAz2"
+                        "Ref": "PublicSubnetAz2"
                     },
                     {
-                        "Ref": "SubnetAz3"
+                        "Ref": "PublicSubnetAz3"
                     }
                 ]
             }
