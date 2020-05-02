@@ -64,6 +64,10 @@
         "MongoInstanceClass": {
             "Type": "String",
             "Default": "db.r5.large"
+        },
+        "MongoDbMasterUsername": {
+            "Type": "String",
+            "Default": "applicationmstr"
         }
     },
     "Resources": {
@@ -1055,7 +1059,9 @@
                 "DBSubnetGroupName": {
                     "Ref": "MongoDBClusterSubnetGroup"
                 },
-                "MasterUsername": "docdb-master",
+                "MasterUsername": {
+                    "Ref": "MongoDbMasterUsername"
+                },
                 "MasterUserPassword": {
                     "Ref": "MongoDbMasterPassword"
                 },
