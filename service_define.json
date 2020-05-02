@@ -1,0 +1,76 @@
+"ApplicationService": {
+    "Type": "AWS::ECS::Service",
+    "Properties": {
+        "Tags": [
+            {
+                "Key": "Name",
+                "Value": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Namespace"
+                            },
+                            "ecs-service"
+                        ]
+                    ]
+                }
+            }
+        ],
+        "Cluster": {
+            "Ref": "ECSCluster"
+        },
+        "DeploymentController": {
+            "Type": "CODE_DEPLOY"
+        },
+        "DesiredCount": "3",
+        "HealthCheckGracePeriodSeconds": "60",
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+            {
+                "ContainerPort": {
+                    "Ref": "ContainerPort"
+                },
+                "TargetGroupArn": {
+                    "Ref": "AlbTargetGroupA"
+                }
+            },
+            {
+                "ContainerPort": {
+                    "Ref": "ContainerPort"
+                },
+                "TargetGroupArn": {
+                    "Ref": "AlbTargetGroupB"
+                }
+            }
+        ],
+        "NetworkConfiguration": {
+            "AwsvpcConfiguration": {
+                "AssignPublicIp": "ENABLED",
+                "SecurityGroups": [
+                    {
+                        "Ref": "ContainerSecurityGroup"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PublicSubnetAz1"
+                    },
+                    {
+                        "Ref": "PublicSubnetAz2"
+                    },
+                    {
+                        "Ref": "PublicSubnetAz3"
+                    }
+                ]
+            }
+        },
+        "PlacementStrategies": [
+            {
+                "Field": "attribute:ecs.availability-zone",
+                "Type": "spread"
+            }
+        ],
+        "SchedulingStrategy": "REPLICA"
+    }
+},

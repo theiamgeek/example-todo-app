@@ -1,0 +1,1191 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "Namespace": {
+            "Default": "todo-app",
+            "Type": "String"
+        },
+        "AlbDomain": {
+            "Type": "String"
+        },
+        "Domain": {
+            "Type": "String"
+        },
+        "ValidationDomain": {
+            "Type": "String"
+        },
+        "AlbValidationDomain": {
+            "Type": "String"
+        },
+        "VpcCidrBlock": {
+            "Type": "String",
+            "Default": "10.0.0.0/16"
+        },
+        "SubnetCidrBlock1": {
+            "Type": "String",
+            "Default": "10.0.0.0/24"
+        },
+        "SubnetCidrBlock2": {
+            "Type": "String",
+            "Default": "10.0.1.0/24"
+        },
+        "SubnetCidrBlock3": {
+            "Type": "String",
+            "Default": "10.0.2.0/24"
+        },
+        "SubnetAz1": {
+            "Type": "String",
+            "Default": "us-east-1a"
+        },
+        "SubnetAz2": {
+            "Type": "String",
+            "Default": "us-east-1b"
+        },
+        "SubnetAz3": {
+            "Type": "String",
+            "Default": "us-east-1c"
+        },
+        "ContainerPort": {
+            "Type": "Number",
+            "Default": "80"
+        },
+        "AlbPort": {
+            "Type": "Number",
+            "Default": "443"
+        },
+        "ApplicationHealthCheckPath": {
+            "Type": "String",
+            "Default": "/"
+        },
+        "MongoDbMasterPassword": {
+            "Type": "String",
+            "NoEcho": "true"
+        },
+        "MongoInstanceClass": {
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "ApplicatonVpc": {
+            "Type": "AWS::EC2::VPC",
+            "Properties": {
+                "CidrBlock": {
+                    "Ref": "VpcCidrBlock"
+                },
+                "EnableDnsSupport": "true",
+                "EnableDnsHostnames": "true",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "VPC"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "PublicSubnetAz1": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "CidrBlock": {
+                    "Ref": "SubnetCidrBlock1"
+                },
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz1"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "public-subnet-1"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "MapPublicIpOnLaunch": "true"
+            }
+        },
+        "PublicSubnetAz2": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "CidrBlock": {
+                    "Ref": "SubnetCidrBlock2"
+                },
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz2"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "public-subnet-2"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "MapPublicIpOnLaunch": "true"
+            }
+        },
+        "PublicSubnetAz3": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "CidrBlock": {
+                    "Ref": "SubnetCidrBlock3"
+                },
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz3"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "public-subnet-3"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "MapPublicIpOnLaunch": "true"
+            }
+        },
+        "InternetGateway": {
+            "Type": "AWS::EC2::InternetGateway",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "igw"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "InternetGatewayAttachment": {
+            "Type": "AWS::EC2::VPCGatewayAttachment",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "DefaultRouteTable": {
+            "Type": "AWS::EC2::RouteTable",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "default-route-table"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "RouteViaInternetGateway": {
+            "Type": "AWS::EC2::Route",
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "DefaultRouteTable"
+                },
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                }
+            }
+        },
+        "PublicSubnet1RouteTableAssoc": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnetAz1"
+                },
+                "RouteTableId": {
+                    "Ref": "DefaultRouteTable"
+                }
+            }
+        },
+        "PublicSubnet2RouteTableAssoc": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnetAz2"
+                },
+                "RouteTableId": {
+                    "Ref": "DefaultRouteTable"
+                }
+            }
+        },
+        "PublicSubnet3RouteTableAssoc": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "PublicSubnetAz3"
+                },
+                "RouteTableId": {
+                    "Ref": "DefaultRouteTable"
+                }
+            }
+        },
+        "ContainerSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow traffic in from ALB to application container.",
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "SecurityGroupIngress": {
+                    "IpProtocol": "tcp",
+                    "FromPort": {
+                        "Ref": "ContainerPort"
+                    },
+                    "ToPort": {
+                        "Ref": "ContainerPort"
+                    },
+                    "SourceSecurityGroupId": {
+                        "Ref": "AlbSecurityGroup"
+                    }
+                }
+            }
+        },
+        "AlbSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow traffic in from CloudFront (the Internet) to the ALB.",
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "SecurityGroupIngress": {
+                    "IpProtocol": "tcp",
+                    "FromPort": {
+                        "Ref": "AlbPort"
+                    },
+                    "ToPort": {
+                        "Ref": "AlbPort"
+                    },
+                    "CidrIp": "0.0.0.0/0"
+                }
+            }
+        },
+        "AlbTargetGroupA": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "Port": {
+                    "Ref": "ContainerPort"
+                },
+                "TargetType": "ip",
+                "Protocol": "HTTP",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "target-group-a"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "HealthCheckEnabled": "true",
+                "HealthCheckPath": {
+                    "Ref": "ApplicationHealthCheckPath"
+                },
+                "Matcher": {
+                    "HttpCode": "200"
+                }
+            }
+        },
+        "AlbTargetGroupB": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "Port": {
+                    "Ref": "ContainerPort"
+                },
+                "TargetType": "ip",
+                "Protocol": "HTTP",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "target-group-b"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "HealthCheckEnabled": "true",
+                "HealthCheckPath": {
+                    "Ref": "ApplicationHealthCheckPath"
+                },
+                "Matcher": {
+                    "HttpCode": "200"
+                }
+            }
+        },
+        "ApplicationLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "SecurityGroups": [
+                    {
+                        "Ref": "AlbSecurityGroup"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PublicSubnetAz1"
+                    },
+                    {
+                        "Ref": "PublicSubnetAz2"
+                    },
+                    {
+                        "Ref": "PublicSubnetAz3"
+                    }
+                ],
+                "Scheme": "internet-facing",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "load-balancer"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "LoadBalancerListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "LoadBalancerArn": {
+                    "Ref": "ApplicationLoadBalancer"
+                },
+                "Port": {
+                    "Ref": "AlbPort"
+                },
+                "Protocol": "HTTPS",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "AlbTargetGroupA"
+                        }
+                    }
+                ],
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "LoadBalancerCertificate"
+                        }
+                    }
+                ]
+            }
+        },
+        "LoadBalancerCertificate": {
+            "Type": "AWS::CertificateManager::Certificate",
+            "Properties": {
+                "DomainName": {
+                    "Ref": "AlbDomain"
+                },
+                "DomainValidationOptions": [
+                    {
+                        "DomainName": {
+                            "Ref": "AlbDomain"
+                        },
+                        "ValidationDomain": {
+                            "Ref": "AlbValidationDomain"
+                        }
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "load-balancer-certificate"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "ValidationMethod": "EMAIL"
+            }
+        },
+        "ECSCluster": {
+            "Type": "AWS::ECS::Cluster",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "ecs-cluster"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "PublicAssetS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls": "false",
+                    "BlockPublicPolicy": "false",
+                    "IgnorePublicAcls": "false",
+                    "RestrictPublicBuckets": "false"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                }
+            }
+        },
+        "PublicAssetS3BucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": {
+                    "Ref": "PublicAssetS3Bucket"
+                },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "CanonicalUser": {
+                                    "Fn::GetAtt": [
+                                        "CloudFrontOAI",
+                                        "S3CanonicalUserId"
+                                    ]
+                                }
+                            },
+                            "Action": "s3:GetObject",
+                            "Resource": [
+                                {
+                                    "Fn::GetAtt": [
+                                        "PublicAssetS3Bucket",
+                                        "Arn"
+                                    ]
+                                },
+                                {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "PublicAssetS3Bucket",
+                                                    "Arn"
+                                                ]
+                                            },
+                                            "/*"
+                                        ]
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "CloudFrontCertificate": {
+            "Type": "AWS::CertificateManager::Certificate",
+            "Properties": {
+                "DomainName": {
+                    "Ref": "Domain"
+                },
+                "DomainValidationOptions": [
+                    {
+                        "DomainName": {
+                            "Ref": "Domain"
+                        },
+                        "ValidationDomain": {
+                            "Ref": "ValidationDomain"
+                        }
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "cloudfront-certificate"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "ValidationMethod": "EMAIL"
+            }
+        },
+        "CloudFrontOAI": {
+            "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+            "Properties": {
+                "CloudFrontOriginAccessIdentityConfig": {
+                    "Comment": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                {
+                                    "Ref": "Namespace"
+                                },
+                                "oai"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "CloudFrontDistro": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Properties": {
+                "DistrbutionConfig": {
+                    "Aliases": [
+                        {
+                            "Ref": "Domain"
+                        }
+                    ],
+                    "CacheBehaviors": [
+                        {
+                            "AllowedMethods": [
+                                "GET",
+                                "HEAD"
+                            ],
+                            "CachedMethods": [
+                                "GET",
+                                "HEAD"
+                            ],
+                            "Compress": "true",
+                            "DefaultTTL": "86400",
+                            "ForwardedValues": {
+                                "QueryString": "false"
+                            },
+                            "MaxTTL": "31536000",
+                            "MinTTL": "0",
+                            "PathPattern": "public/*",
+                            "TargetOriginId": {
+                                "Fn::Join": [
+                                    "-",
+                                    [
+                                        {
+                                            "Ref": "Namespace"
+                                        },
+                                        "s3-origin"
+                                    ]
+                                ]
+                            },
+                            "ViewerProtocolPolicy": "redirect-to-https"
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "AllowedMethods": [
+                            "GET",
+                            "HEAD",
+                            "OPTIONS",
+                            "PUT",
+                            "POST",
+                            "PATCH",
+                            "DELETE"
+                        ],
+                        "CachedMethods": [
+                            "GET",
+                            "HEAD"
+                        ],
+                        "Compress": "true",
+                        "DefaultTTL": "0",
+                        "ForwardedValues": {
+                            "QueryString": "true",
+                            "Cookies": {
+                                "Forward": "all"
+                            }
+                        },
+                        "MaxTTL": "0",
+                        "MinTTL": "0",
+                        "TargetOriginId": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "alb-origin"
+                                ]
+                            ]
+                        },
+                        "ViewerProtocolPolicy": "redirect-to-https"
+                    },
+                    "Enabled": "true",
+                    "HttpVersion": "http2",
+                    "Origins": [
+                        {
+                            "CustomOriginConfig": {
+                                "HTTPSPort": {
+                                    "Ref": "AlbPort"
+                                },
+                                "OriginProtocolPolicy": "https-only",
+                                "OriginSSLProtocols": [
+                                    "TLSv1.2"
+                                ]
+                            },
+                            "DomainName": {
+                                "Ref": "AlbDomain"
+                            },
+                            "Id": {
+                                "Fn::Join": [
+                                    "-",
+                                    [
+                                        {
+                                            "Ref": "Namespace"
+                                        },
+                                        "alb-origin"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "PublicAssetS3Bucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Join": [
+                                    "-",
+                                    [
+                                        {
+                                            "Ref": "Namespace"
+                                        },
+                                        "s3-origin"
+                                    ]
+                                ]
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Ref": "CloudFrontOAI"
+                                }
+                            }
+                        }
+                    ],
+                    "PriceClass": "PriceClass_100",
+                    "ViewerCertificate": {
+                        "AcmCertificateArn": {
+                            "Ref": "CloudFrontCertificate"
+                        },
+                        "MinimumProtocolVersion": "TLSv1.2_2018"
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "distribution"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DnsZone": {
+            "Type": "AWS::Route53::HostedZone",
+            "Properties": {
+                "Name": {
+                    "Ref": "Domain"
+                }
+            }
+        },
+        "AlbDnsCnamRecord": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::GetAtt": [
+                            "ApplicationLoadBalancer",
+                            "DNSName"
+                        ]
+                    },
+                    "HostedZoneId": {
+                        "Fn::GetAtt": [
+                            "ApplicationLoadBalancer",
+                            "CanonicalHostedZoneID"
+                        ]
+                    }
+                },
+                "HostedZoneId": {
+                    "Ref": "DnsZone"
+                },
+                "Name": {
+                    "Ref": "AlbDomain"
+                },
+                "Type": "A"
+            }
+        },
+        "CloudFrontDnsCnamRecord": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "AliasTarget": {
+                    "DNSName": {
+                        "Fn::GetAtt": [
+                            "CloudFrontDistro",
+                            "DomainName"
+                        ]
+                    },
+                    "HostedZoneId": "Z2FDTNDATAQYW2"
+                },
+                "HostedZoneId": {
+                    "Ref": "DnsZone"
+                },
+                "Name": {
+                    "Ref": "Domain"
+                },
+                "Type": "A"
+            }
+        },
+        "BuildArtifactS3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "PublicAccessBlockConfiguration": {
+                    "BlockPublicAcls": "true",
+                    "BlockPublicPolicy": "true",
+                    "IgnorePublicAcls": "true",
+                    "RestrictPublicBuckets": "true"
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "ECSTaskExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2008-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": {
+                                    "Fn::Join": [
+                                        ".",
+                                        [
+                                            "ecs-tasks",
+                                            {
+                                                "Ref": "AWS::URLSuffix"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    {
+                        "Fn::Join": [
+                            ":",
+                            [
+                                "arn",
+                                {
+                                    "Ref": "AWS::Partition"
+                                },
+                                "iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                            ]
+                        ]
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "ecs-task-execution-role"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "CodeDeployRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": {
+                                    "Fn::Join": [
+                                        ".",
+                                        [
+                                            "codedeploy",
+                                            {
+                                                "Ref": "AWS::URLSuffix"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    {
+                        "Fn::Join": [
+                            ":",
+                            [
+                                "arn",
+                                {
+                                    "Ref": "AWS::Partition"
+                                },
+                                "iam::aws:policy/AWSCodeDeployRoleForECS"
+                            ]
+                        ]
+                    },
+                    {
+                        "Fn::Join": [
+                            ":",
+                            [
+                                "arn",
+                                {
+                                    "Ref": "AWS::Partition"
+                                },
+                                "iam::aws:policy/AmazonS3ReadOnlyAccess"
+                            ]
+                        ]
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "code-deploy-role"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "MongoDBClusterParameterGroup": {
+            "Type": "AWS::DocDB::DBClusterParameterGroup",
+            "Properties": {
+                "Description": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Namespace"
+                            },
+                            "documentdb-cluster-parameter-group"
+                        ]
+                    ]
+                },
+                "Family": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Namespace"
+                            },
+                            "docdb"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "audit_logs": "enabled",
+                    "change_stream_log_retention_duration": "10800",
+                    "profiler": "disabled",
+                    "profiler_sampling_rate": "1.0",
+                    "profiler_threshold_ms": "100",
+                    "tls": "disabled",
+                    "ttl_monitor": "enabled"
+                }
+            }
+        },
+        "MongoDBClusterSubnetGroup": {
+            "Type": "AWS::DocDB::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Namespace"
+                            },
+                            "documentdb-subnet-group"
+                        ]
+                    ]
+                },
+                "SubnetIds": [
+                    {
+                        "Ref": "SubnetAz1"
+                    },
+                    {
+                        "Ref": "SubnetAz2"
+                    },
+                    {
+                        "Ref": "SubnetAz3"
+                    }
+                ]
+            }
+        },
+        "MongoSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow traffic in from ECS instances to Mongo DB.",
+                "VpcId": {
+                    "Ref": "ApplicatonVpc"
+                },
+                "SecurityGroupIngress": {
+                    "IpProtocol": "tcp",
+                    "FromPort": "27107",
+                    "ToPort": "27107",
+                    "SourceSecurityGroupId": {
+                        "Ref": "ContainerSecurityGroup"
+                    }
+                }
+            }
+        },
+        "MongoDbCluster": {
+            "Type": "AWS::DocDB::DBCluster",
+            "Properties": {
+                "AvailabilityZones": [
+                    {
+                        "Ref": "SubnetAz1"
+                    },
+                    {
+                        "Ref": "SubnetAz2"
+                    },
+                    {
+                        "Ref": "SubnetAz3"
+                    }
+                ],
+                "DBClusterParameterGroup": {
+                    "Ref": "MongoDBClusterParameterGroup"
+                },
+                "DBSubnetGroupName": {
+                    "Ref": "MongoDBClusterSubnetGroup"
+                },
+                "MasterUsername": "docdb-master",
+                "MasterUserPassword": {
+                    "Ref": "MongoDbMasterPassword"
+                },
+                "StorageEncrypted": "true",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "mongo-database"
+                                ]
+                            ]
+                        }
+                    }
+                ],
+                "VpcSecurityGroupIds": [
+                    {
+                        "Ref": "MongoSecurityGroup"
+                    }
+                ]
+            }
+        },
+        "MongoInstance1": {
+            "Type": "AWS::DocDB::DBInstance",
+            "Properties": {
+                "AutoMinorVersionUpgrade": "true",
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz1"
+                },
+                "DBClusterIdentifier": {
+                    "Ref": "MongoDbCluster"
+                },
+                "DBInstanceClass": {
+                    "Ref": "MongoInstanceClass"
+                }
+            }
+        },
+        "MongoInstance2": {
+            "Type": "AWS::DocDB::DBInstance",
+            "Properties": {
+                "AutoMinorVersionUpgrade": "true",
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz2"
+                },
+                "DBClusterIdentifier": {
+                    "Ref": "MongoDbCluster"
+                },
+                "DBInstanceClass": {
+                    "Ref": "MongoInstanceClass"
+                }
+            }
+        },
+        "MongoInstance": {
+            "Type": "AWS::DocDB::DBInstance",
+            "Properties": {
+                "AutoMinorVersionUpgrade": "true",
+                "AvailabilityZone": {
+                    "Ref": "SubnetAz3"
+                },
+                "DBClusterIdentifier": {
+                    "Ref": "MongoDbCluster"
+                },
+                "DBInstanceClass": {
+                    "Ref": "MongoInstanceClass"
+                }
+            }
+        },
+        "ContainerRepo": {
+            "Type": "AWS::ECR::Repository",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Namespace"
+                                    },
+                                    "container-repo"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

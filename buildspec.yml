@@ -9,6 +9,8 @@ env:
     MONGO_DB_URL_ARN: "arn:aws:ssm:us-east-1:904948009583:parameter/docdbsecret"
     CONT_LOG_GP: "/ecs/first-run-task-definition"
     CONT_LOG_STRM_PFIX: "ecs"
+    AWS_ACCOUNT_ID: 000000000000
+    IMAGE_REPO_NAME: 
 phases:
   install:
     runtime-versions:
