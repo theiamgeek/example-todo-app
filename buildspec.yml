@@ -7,8 +7,8 @@ env:
     TASK_NAME: "todo-app"
     TASK_EXEC_ROLE: "arn:aws:iam::068510661231:role/Demo-ECSTaskExecutionRole-E773T4FDRT53"
     MONGO_DB_URL_ARN: "arn:aws:ssm:us-east-1:068510661231:parameter/todo-app-mongodburl"
-    CONT_LOG_GP: "/ecs/todo-app"
-    CONT_LOG_STRM_PFIX: "/container/"
+    CONT_LOG_GP: "ecs/todo-app"
+    CONT_LOG_STRM_PFIX: "container/"
     AWS_ACCOUNT_ID: "068510661231"
     IMAGE_REPO_NAME: "demo-contai-1gs6o4kt9iepu"
 phases:
