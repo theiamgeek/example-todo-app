@@ -640,6 +640,9 @@
         },
         "CloudFrontDistro": {
             "Type": "AWS::CloudFront::Distribution",
+            "DependsOn": [
+                "CloudFrontOAI"
+            ],
             "Properties": {
                 "DistributionConfig": {
                     "Aliases": [
@@ -764,7 +767,15 @@
                             },
                             "S3OriginConfig": {
                                 "OriginAccessIdentity": {
-                                    "Ref": "CloudFrontOAI"
+                                    "Fn::Join": [
+                                        "/",
+                                        [
+                                            "origin-access-identity/cloudfront",
+                                            {
+                                                "Ref": "CloudFrontOAI"
+                                            }
+                                        ]
+                                    ]
                                 }
                             }
                         }
@@ -774,7 +785,8 @@
                         "AcmCertificateArn": {
                             "Ref": "CloudFrontCertificate"
                         },
-                        "MinimumProtocolVersion": "TLSv1.2_2018"
+                        "MinimumProtocolVersion": "TLSv1.2_2018",
+                        "SslSupportMethod": "sni-only"
                     }
                 },
                 "Tags": [
