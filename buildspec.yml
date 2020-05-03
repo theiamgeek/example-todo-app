@@ -46,9 +46,12 @@ phases:
       - envsubst < appspec_template.json > appspec.json
 artifacts:
   files:
-    - '**/*'
-  base-directory: 'public'
+    -'**/*'
   secondary-artifacts:
+    public:
+      files:
+        - '**/*'
+      base-directory: 'public'
     appspec:
       files:
         - appspec.json
