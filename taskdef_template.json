@@ -71,7 +71,8 @@
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-group": "$CONT_LOG_GP",
-                    "awslogs-region": "$AWS_REGION"
+                    "awslogs-region": "$AWS_REGION",
+                    "awslogs-stream-prefix": "$CONT_LOG_STRM_PFIX"
                 }
             }
         }
