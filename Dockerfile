@@ -8,7 +8,7 @@ RUN npm install --production
 
 COPY lib ./lib
 
-COPY https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem ./
+ADD https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem ./
 
 EXPOSE 80
 
