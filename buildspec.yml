@@ -45,8 +45,6 @@ phases:
       - echo Filling Application Specification template...
       - envsubst < appspec_template.json > appspec.json
 artifacts:
-  files:
-    -'**/*'
   secondary-artifacts:
     public:
       files:
