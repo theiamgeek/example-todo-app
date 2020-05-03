@@ -640,9 +640,6 @@
         },
         "CloudFrontDistro": {
             "Type": "AWS::CloudFront::Distribution",
-            "DependsOn": [
-                "CloudFrontOAI"
-            ],
             "Properties": {
                 "DistributionConfig": {
                     "Aliases": [
