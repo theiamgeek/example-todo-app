@@ -47,6 +47,7 @@ phases:
 artifacts:
   files:
     - 'public/**/*'
+  name: public
   secondary-artifacts:
     appspec:
       files:
