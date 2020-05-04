@@ -1043,8 +1043,8 @@
                 },
                 "SecurityGroupIngress": {
                     "IpProtocol": "tcp",
-                    "FromPort": "27107",
-                    "ToPort": "27107",
+                    "FromPort": "27017",
+                    "ToPort": "27017",
                     "SourceSecurityGroupId": {
                         "Ref": "ContainerSecurityGroup"
                     }
