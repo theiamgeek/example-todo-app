@@ -1,6 +1,6 @@
 {
   "name": "example-todo-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Unthink Stack example app",
   "main": "lib/server/server.js",
   "scripts": {
